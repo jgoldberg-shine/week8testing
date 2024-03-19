@@ -21,7 +21,7 @@ def home():
     mega_list = Mega.query.all()
     message = request.args.get("message", None) #Get any message or success parameter from the request URL
     success = request.args.get("success", None)
-    data = Mega.query.all()
+    # data = Mega.query.all()
 
     staff_mvp_names = [mega.staff_mvp for mega in mega_list]
     if staff_mvp_names:
@@ -66,7 +66,7 @@ def home():
         daily_earnings.append(entry.daily_earnings)
 
     plt.figure(figsize=(8, 6))
-    plt.bar(days, daily_earnings)
+    plt.scatter(days, daily_earnings)
     plt.title('Daily Earnings')
     plt.xlabel('Day')
     plt.ylabel('Earnings')
@@ -78,7 +78,7 @@ def home():
 
     graph_url = base64.b64encode(img.getvalue()).decode()
 
-    return render_template("index.html", mega_list=mega_list, message=message, success=success, data=data, common_name = common_name, best_daily_earnings = best_daily_earnings, biggest_basket_earnings = biggest_basket_earnings, common_best_seller = common_best_seller, common_worst_seller = common_worst_seller, graph_url = graph_url)
+    return render_template("index.html", mega_list=mega_list, message=message, success=success, common_name = common_name, best_daily_earnings = best_daily_earnings, biggest_basket_earnings = biggest_basket_earnings, common_best_seller = common_best_seller, common_worst_seller = common_worst_seller, graph_url = graph_url)
 
 @my_view.route("/add", methods=["POST"])    #allows post methods
 def add():
@@ -92,69 +92,19 @@ def add():
             worst_seller = request.form.get ("worst_seller")
             existing_entry = Mega.query.filter_by(day=day).first()
             if existing_entry:
-                message = "Error adding your task to the ToDo list, you cannot have more than one entry for the same day"
+                message = "Error adding your entry. You cannot add two entries for the same day. If you wish to delete or edit an entry then go to the 'Data' page."
                 return redirect(url_for("my_view.home", message=message))
             new_mega = Mega(day = day, biggest_basket = biggest_basket, staff_mvp = staff_mvp, daily_earnings = daily_earnings, best_seller = best_seller, worst_seller = worst_seller)
             db.session.add(new_mega)   #add into db
             db.session.commit() 
-            success = "Task added successfully"    #
+            success = "Entry added successfully"    #
             return redirect(url_for("my_view.home", success = success))
         except:
-            message = "Error adding your task to the ToDo list, you can not have more than one of the same task" # If an error occurs during adding the task, set an error message
+            message = "Error adding your entry. You cannot add two entries for the same day. If you wish to delete or edit an entry then go to the 'Data' page." # If an error occurs during adding the task, set an error message
             return redirect(url_for("my_view.home", message = message))
 
 
-# @my_view.route("/graph")
-# def graph():
-#     days = []
-#     daily_earnings = []
 
-#     entries = Mega.query.all()
-#     for entry in entries:
-#         # Extract day and daily_earnings from each entry
-#         days.append(entry.day)
-#         daily_earnings.append(entry.daily_earnings)
-
-#     plt.figure(figsize=(8, 6))
-#     plt.bar(days, daily_earnings)
-#     plt.title('Daily Earnings')
-#     plt.xlabel('Day')
-#     plt.ylabel('Earnings')
-
-#     img = BytesIO()
-#     plt.savefig(img, format='png')
-#     img.seek(0)
-#     plt.close()
-
-#     graph_url = base64.b64encode(img.getvalue()).decode()
-#     return render_template('index.html', graph_url=graph_url)
-
-@my_view.route('/plot')
-def plot():
-    days = []
-    earnings = []
-
-    # Fetch data from the database
-    data = Mega.query.all()
-
-    # Extract days and earnings
-    for item in data:
-        days.append(item.day)
-        earnings.append(item.daily_earnings)
-
-    # Plotting the data
-    plt.figure(figsize=(10, 5))
-    plt.plot(days, earnings, marker='o', linestyle='-')
-    plt.title('Daily Earnings')
-    plt.xlabel('Day')
-    plt.ylabel('Earnings')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    # Saving the plot to a file
-    plt.savefig('static/daily_earnings.png')
-
-    return render_template('index.html')
 
 
 @my_view.route("/page2")
@@ -186,6 +136,28 @@ def page7():
 def page8():
     return render_template("page8.html")
 
+@my_view.route("/page9")
+def page9():
+    data = Mega.query.all()
+    return render_template("page9.html", data = data)
+
+@my_view.route("/delete/<mega_id>", methods =["POST"])
+def delete (mega_id):
+    mega = Mega.query.filter_by(id=mega_id).first() # Find the todo item by its ID
+    db.session.delete(mega) # Delete the todo item from the database
+    db.session.commit()
+    return redirect(url_for("my_view.home"))
+
+
+
+# @my_view.route("/page9/<int:mega_id>", methods=['POST'])
+# def page9(mega_id):
+#     mega = Mega.query.get(mega_id)  # Retrieve the Mega object by its ID
+#     if mega:  # Check if the Mega object exists
+#         db.session.delete(mega)  # Delete the Mega object from the database
+#         db.session.commit()
+#     return redirect(url_for("page9.html"))  # Redirect to the home endpoint
+
 
 
 # @my_view.route("/update/<todo_id>")
@@ -195,12 +167,6 @@ def page8():
 #     db.session.commit() 
 #     return redirect(url_for("my_view.home"))
 
-# @my_view.route("/delete/<todo_id>")
-# def delete (todo_id):
-#     todo = Todo.query.filter_by(id=todo_id).first() # Find the todo item by its ID
-#     db.session.delete(todo) # Delete the todo item from the database
-#     db.session.commit()
-#     return redirect(url_for("my_view.home"))
 
 # @my_view.route("/edit/<int:todo_id>", methods=["GET", "POST"])
 # def edit_todo(todo_id):
@@ -216,10 +182,6 @@ def page8():
 #         return redirect(url_for("my_view.home", message=message)) # Redirect to the home page with the error message
 
 
-# @my_view.route("/page2")
-# def page2():
-#     data = Todo.query.all()
-#     return render_template("page2.html", data = data)
 
 # @my_view.route("/graph")
 # def graph():
@@ -243,28 +205,3 @@ def page8():
 
 #     return render_template('graph.html', graph_url=graph_url)       # Render the HTML template with the graph
     
-# @my_view.route("/graph2")
-# def graph2():
-#     dates = []
-#     tasks_count = []
-
-#     entries = Todo.query.all()
-#     for entry in entries:
-#         # Convert entry.date_created to a datetime object
-#         date_created = dateutil.parser.parse(entry.date_created)
-#         dates.append(date_created.strftime('%Y-%m-%d'))
-#         tasks_count = Todo.query.filter_by(complete=True).count()
-
-#     plt.figure(figsize=(8, 6))
-#     plt.bar(dates, tasks_count)
-#     plt.title('Completed Tasks by Date')
-#     plt.xlabel('Date')
-#     plt.ylabel('Number of Tasks Completed')
-
-#     img = BytesIO()
-#     plt.savefig(img, format='png')
-#     img.seek(0)
-#     plt.close()
-
-#     date_graph_url = base64.b64encode(img.getvalue()).decode()
-#     return render_template('graph2.html', date_graph_url=date_graph_url)

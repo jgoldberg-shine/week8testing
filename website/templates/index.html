@@ -2,6 +2,13 @@
 
 {% block content %}
 
+{% if message %}
+<p style="color: red;">{{ message }}</p>
+{% endif %}
+{% if success %}
+<p style="color: green;">{{ success }}</p>
+{% endif %}
+
 <div class="container">
     <form action="/add" method="post">
         <div class="input-container">
@@ -32,7 +39,7 @@
             </select>
         </div>
         
-        <button type="submit">Enter Data</button>
+        <button type="submit">Submit Data</button>
     </form>
 
 </div>
