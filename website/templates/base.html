@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaBytes</title>
+</head>
+<body>
+
+  <nav>
+    <a href ="{{url_for('my_view.home')}}">Home</a>
+    <a href ="{{url_for('my_view.page2')}}">Monday</a>
+    <a href ="{{url_for('my_view.page3')}}">Tuesday</a>
+    <a href ="{{url_for('my_view.page4')}}">Wednesday</a>
+    <a href ="{{url_for('my_view.page5')}}">Thursday</a>
+    <a href ="{{url_for('my_view.page6')}}">Friday</a>
+    <a href ="{{url_for('my_view.page7')}}">Saturday</a>
+    <a href ="{{url_for('my_view.page8')}}">Sunday</a>
+  </nav>
+  
+  {% block content %}
+  {% endblock %}
+  
+</body>
+</html>

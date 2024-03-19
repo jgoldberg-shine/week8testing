@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="/add" method="post">
+    <label for="task">Staff MVP:</label>
+    <input type="text" id="task" name="task" placeholder="Enter a Task">
+    <label for="money_made">money made:</label>
+    <input type="text" id="task" name="task" placeholder="Enter a Task">
+    <label for="biggest_spend">biggest spend</label>
+    <input type="text" id="task" name="task" placeholder="Enter a Task">
+    </select>
+
+<button type="submit">Add Task</button>
+</form>
+
+{% endblock %}
