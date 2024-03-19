@@ -2,5 +2,13 @@
 
 {% block content %}
 
+<div class="content">
+    {% for data in data %}
+        <div class="data">
+            <p><b>#{{ data.id }}</b></p>
+            <p class="name">{{ data.staff_mvp }}</p>
+        </div>
+    {% endfor %}
+
 
 {% endblock %}
