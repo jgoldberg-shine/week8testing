@@ -13,7 +13,7 @@ import base64
 from datetime import datetime
 import dateutil.parser
 from collections import Counter
-from sqlalchemy import func
+from sqlalchemy import func, asc, desc
 
 my_view = Blueprint("my_view", __name__)
 
@@ -155,20 +155,55 @@ def page9():
     data = Mega.query.all()
     return render_template("page9.html", data = data)
 
-@my_view.route("/page10")
+
+@my_view.route("/add2", methods=["POST"])    #allows post methods
+def add2():
+    if request.method == 'POST':
+            name = request.form.get("name")
+            voids = request.form.get("voids")
+            new_void= Voids(name = name, voids = voids)
+            db.session.add(new_void)   #add into db
+            db.session.commit() 
+    return redirect(url_for("my_view.home"))
+
+@my_view.route("/page10", methods=["GET", "POST"])
 def page10():
-    voids_data = Voids.query.all()
-    
+    sort_criteria = request.form.get("sort_criteria")
+
     name = []
-    number_voids = []
+    voids = []
 
     entries = Voids.query.all()
     for entry in entries:
-        # Extract day and daily_earnings from each entry
         name.append(entry.name)
-        number_voids.append(entry.voids)
+        voids.append(entry.voids)
+
+    if sort_criteria == "name_asc":
+        name, voids = zip(*sorted(zip(name, voids)))
+    elif sort_criteria == "name_desc":
+        name, voids = zip(*sorted(zip(name, voids), reverse=True))
+    elif sort_criteria == "voids_asc":
+        name, voids = zip(*sorted(zip(name, voids), key=lambda x: x[1]))
+    elif sort_criteria == "voids_desc":
+        name, voids = zip(*sorted(zip(name, voids), key=lambda x: x[1], reverse=True))
+
     
-    return render_template("page10.html", voids_data = voids_data)
+    
+    plt.figure(figsize=(8, 6))
+    plt.bar(name, voids)
+    plt.title('Number of Voids')
+    plt.xlabel('Name')
+    plt.ylabel('Voids')
+
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plt.close()
+
+    graph_url = base64.b64encode(img.getvalue()).decode()
+    return render_template("page10.html", graph_url = graph_url, sort_criteria = sort_criteria)
+
+
 
 @my_view.route("/delete/<mega_id>", methods =["POST"])
 def delete (mega_id):
@@ -176,6 +211,7 @@ def delete (mega_id):
     db.session.delete(mega) # Delete the todo item from the database
     db.session.commit()
     return redirect(url_for("my_view.home"))
+
 
 # @my_view.route("/checklist")
 # def checklist():
@@ -253,3 +289,18 @@ def delete (mega_id):
             #     highest_earning_day = None  # Setting a default value when no entries are found
             #     print("No entries found in the database.")
             #     return render_template("home.html", highest_earning_day=highest_earning_day)
+
+    # sort_options = {
+    #     'low_to_high': 'Lowest to Highest',
+    #     'high_to_low': 'Highest to Lowest',
+    #     'alphabetical': 'Alphabetical'
+    # }
+    # if request.method == 'POST':
+    #     selected_option = request.form.get('sort_option')
+
+    #     if selected_option == 'low_to_high':
+    #         data = Voids.query.order_by(asc(Voids.voids)).all()
+    #     elif selected_option == 'high_to_low':
+    #         data = Voids.query.order_by(desc(Voids.voids)).all()
+    #     else:
+    #         data = Voids.query.order_by(asc(Voids.name)).all()
