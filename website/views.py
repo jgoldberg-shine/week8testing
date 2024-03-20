@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from .models import Mega
+from .models import Voids
 from . import db
 import matplotlib
 matplotlib.use("Agg")
@@ -40,7 +41,7 @@ def home():
         common_worst_seller = Counter(worst_item).most_common(1)[0][0]
     else:
         common_worst_seller = None
-    
+
     best_day = [mega.daily_earnings for mega in mega_list]
     if best_day:
         best_day_object = max(mega_list, key=lambda x: str(x.daily_earnings))
@@ -65,8 +66,11 @@ def home():
         days.append(entry.day)
         daily_earnings.append(entry.daily_earnings)
 
+    highest_day_earnings = db.session.query(Mega.day, func.max(Mega.daily_earnings)).first()
+    best_daily_earnings, highest_day = highest_day_earnings
+
     plt.figure(figsize=(8, 6))
-    plt.scatter(days, daily_earnings)
+    plt.scatter(days, daily_earnings, marker='X')
     plt.title('Daily Earnings')
     plt.xlabel('Day')
     plt.ylabel('Earnings')
@@ -78,18 +82,22 @@ def home():
 
     graph_url = base64.b64encode(img.getvalue()).decode()
 
-    return render_template("index.html", mega_list=mega_list, message=message, success=success, common_name = common_name, best_daily_earnings = best_daily_earnings, biggest_basket_earnings = biggest_basket_earnings, common_best_seller = common_best_seller, common_worst_seller = common_worst_seller, graph_url = graph_url)
+    all_days = []
+    for mega in mega_list:
+        all_days.append(mega.day)
+
+    return render_template("index.html", mega_list=mega_list, message=message, success=success, common_name = common_name, best_daily_earnings = best_daily_earnings, biggest_basket_earnings = biggest_basket_earnings, common_best_seller = common_best_seller, common_worst_seller = common_worst_seller, graph_url = graph_url, all_days=all_days, highest_day=highest_day)
 
 @my_view.route("/add", methods=["POST"])    #allows post methods
 def add():
     if request.method == 'POST':
         try:
             day = request.form.get("day")
-            staff_mvp = request.form.get("staff_mvp")
+            staff_mvp = request.form.get("staff_mvp").title()
             biggest_basket = request.form.get("biggest_basket")
             daily_earnings = request.form.get ("daily_earnings")
-            best_seller = request.form.get ("best_seller")
-            worst_seller = request.form.get ("worst_seller")
+            best_seller = request.form.get ("best_seller").title()
+            worst_seller = request.form.get ("worst_seller").title()
             existing_entry = Mega.query.filter_by(day=day).first()
             if existing_entry:
                 message = "Error adding your entry. You cannot add two entries for the same day. If you wish to delete or edit an entry then go to the 'Data' page."
@@ -114,32 +122,53 @@ def page2():
 
 @my_view.route("/page3")
 def page3():
-    return render_template("page3.html")
+    data = Mega.query.all()
+    return render_template("page3.html", data = data)
 
 @my_view.route("/page4")
 def page4():
-    return render_template("page4.html")
+    data = Mega.query.all()
+    return render_template("page4.html", data = data)
 
 @my_view.route("/page5")
 def page5():
-    return render_template("page5.html")
+    data = Mega.query.all()
+    return render_template("page5.html", data = data)
 
 @my_view.route("/page6")
 def page6():
-    return render_template("page6.html")
+    data = Mega.query.all()
+    return render_template("page6.html", data = data)
 
 @my_view.route("/page7")
 def page7():
-    return render_template("page7.html")
+    data = Mega.query.all()
+    return render_template("page7.html", data = data)
 
 @my_view.route("/page8")
 def page8():
-    return render_template("page8.html")
+    data = Mega.query.all()
+    return render_template("page8.html", data = data)
 
 @my_view.route("/page9")
 def page9():
     data = Mega.query.all()
     return render_template("page9.html", data = data)
+
+@my_view.route("/page10")
+def page10():
+    voids_data = Voids.query.all()
+    
+    name = []
+    number_voids = []
+
+    entries = Voids.query.all()
+    for entry in entries:
+        # Extract day and daily_earnings from each entry
+        name.append(entry.name)
+        number_voids.append(entry.voids)
+    
+    return render_template("page10.html", voids_data = voids_data)
 
 @my_view.route("/delete/<mega_id>", methods =["POST"])
 def delete (mega_id):
@@ -148,6 +177,16 @@ def delete (mega_id):
     db.session.commit()
     return redirect(url_for("my_view.home"))
 
+# @my_view.route("/checklist")
+# def checklist():
+#     data = Mega.query.all()
+#     days_with_data = [mega.day for mega in data]
+    
+#     all_days = [day for sublist in days_with_data for day in sublist]
+
+#     unique_days = list(set(all_days))
+    
+#     return render_template("index.html", unique_days=unique_days)
 
 
 # @my_view.route("/page9/<int:mega_id>", methods=['POST'])
@@ -205,3 +244,12 @@ def delete (mega_id):
 
 #     return render_template('graph.html', graph_url=graph_url)       # Render the HTML template with the graph
     
+
+            # max_earnings_entry = Mega.query.order_by(Mega.daily_earnings.desc()).first()
+            # if max_earnings_entry:
+            #     highest_earning_day = max_earnings_entry.day
+            #     print(highest_earning_day)
+            # else:
+            #     highest_earning_day = None  # Setting a default value when no entries are found
+            #     print("No entries found in the database.")
+            #     return render_template("home.html", highest_earning_day=highest_earning_day)

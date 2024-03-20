@@ -1,6 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-
+<section class="dashboard">
+    <div class="data-segment">
+        {% for data in data %}
+            {% if data.day == 'Friday' %}
+            <div class="segment">
+                <h2>MVP:</h2>
+                <p>{{ data.staff_mvp }}</p>
+                <h2>Best Seller:</h2>
+                <p>{{ data.best_seller }}</p>
+                <h2>Worst Seller:</h2>
+                <p>{{ data.worst_seller }}</p>
+                <h2>Daily Earnings:</h2>
+                <p>{{ data.daily_earnings }}</p>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="images">
+        <img src="{{ url_for('static', filename='pie_charts/friday_pie.png') }}" alt="Image 1">
+        <img src="{{ url_for('static', filename='bar_charts/friday_bar.png') }}" alt="Image 2">
+    </div>
+</section>
 {% endblock %}

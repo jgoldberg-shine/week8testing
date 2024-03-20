@@ -10,50 +10,82 @@
 {% endif %}
 
 <div class="container">
-    <form action="/add" method="post">
-        <div class="input-container">
-            <label for="staff_mvp">Staff MVP:</label>
-            <input type="text" id="staff_mvp" name="staff_mvp" placeholder="Enter a staff MVP">
-            
-            <label for="daily_earnings">Daily Earnings:</label>
-            <input type="text" id="daily_earnings" name="daily_earnings" placeholder="Enter daily earnings">
-            
-            <label for="biggest_basket">Biggest Basket:</label>
-            <input type="text" id="biggest_basket" name="biggest_basket" placeholder="Enter biggest basket">
-            
-            <label for="best_seller">Best Seller:</label>
-            <input type="text" id="best_seller" name="best_seller" placeholder="Enter best-selling item">
-            
-            <label for="worst_seller">Worst Seller:</label>
-            <input type="text" id="worst_seller" name="worst_seller" placeholder="Enter worst-selling item">
-            
-            <label for="day">Day:</label>
-            <select id="day" name="day">
-                <option value="Sunday">Sunday</option>
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-            </select>
-        </div>
+    <details>
+        <summary>
+            Expand to Input Data
+        </summary>
+        <form action="/add" method="post">
+            <hr>
+            <label>Input Data</label>
+            <div class="input-container">
+                <label for="staff_mvp">Staff MVP:</label>
+                <input type="text" id="staff_mvp" name="staff_mvp" placeholder="Enter a staff MVP" required>
+
+                <label for="daily_earnings">Daily Earnings:</label>
+                <input type="number" id="daily_earnings" name="daily_earnings" placeholder="Enter daily earnings" required>
+
+                <label for="biggest_basket">Biggest Basket:</label>
+                <input type="number" id="biggest_basket" name="biggest_basket" placeholder="Enter biggest basket" required>
+
+                <label for="best_seller">Best Seller:</label>
+                <input type="text" id="best_seller" name="best_seller" placeholder="Enter best-selling item" required>
+
+                <label for="worst_seller">Worst Seller:</label>
+                <input type="text" id="worst_seller" name="worst_seller" placeholder="Enter worst-selling item" required>
+
+                <label for="day">Day:</label>
+                <select id="day" name="day">
+                    <option value="Sunday">Sunday</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                </select>
+            </div>
+
+            <button type="submit">Submit Data</button>
+        </form>
+    </details>
+    <hr>
+
+<div class="dashboard">
+    <div class="segment">
+        <h1>Days With Completed Records</h1>
         
-        <button type="submit">Submit Data</button>
-    </form>
-
+        <p>{% for day in all_days %}{{ day }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+        
+    </div>
 </div>
+<hr>
+<section class="dashboard">
+    <div class="segment">
+        <h2>MVP:</h2>
+        <p>{{ common_name }}</p>
+    </div>
+    <div class="segment">
+        <h2>Highest income </h2>
+        <p>£{{highest_day}} on {{ best_daily_earnings}}</p>
+    </div>
+    <div class="segment">
+        <h2>Biggest Basket:</h2>
+        <p>£{{ biggest_basket_earnings }}</p>
+    </div>
+    <div class="segment">
+        <h2>Best Selling Item:</h2>
+        <p>{{ common_best_seller }}</p>
+    </div>
+    <div class="segment">
+        <h2>Worst Selling Item:</h2>
+        <p>{{ common_worst_seller }}</p>
+    </div>
+</section>
+<hr>
 
-<div class="content">
-    <p>MVP: {{ common_name }}</p>
-    <p>Best Earning was £{{ best_daily_earnings }} on: {{ best_day_object }}</p>
-    <p>Biggest Basket: {{ biggest_basket_earnings }}</p>
-    <p>Best selling item: {{ common_best_seller }}</p>
-    <p>Worst selling item: {{ common_worst_seller }}</p>
-
+<div class="graph-container">
+    <h1>Graph</h1>
+    <img src="data:image/png;base64,{{ graph_url }}" alt="Earnings Graph">
 </div>
-
-<h1>Graph</h1>
-<img src="data:image/png;base64,{{ graph_url }}" alt="Earnings Graph">
 
 {% endblock %}
