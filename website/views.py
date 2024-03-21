@@ -1,6 +1,5 @@
 from flask import Flask, Blueprint, render_template, request, redirect, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy
-import datetime
 from .models import Mega
 from .models import Voids
 from . import db
@@ -10,10 +9,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
 import base64
-from datetime import datetime
-import dateutil.parser
 from collections import Counter
 from sqlalchemy import func, asc, desc
+import numpy as np
+import matplotlib.pyplot as plt
 
 my_view = Blueprint("my_view", __name__)
 
@@ -161,10 +160,19 @@ def add2():
     if request.method == 'POST':
             name = request.form.get("name")
             voids = request.form.get("voids")
-            new_void= Voids(name = name, voids = voids)
+            transactions = request.form.get("transactions")
+            new_void= Voids(name = name, voids = voids, transactions = transactions)
             db.session.add(new_void)   #add into db
             db.session.commit() 
-    return redirect(url_for("my_view.home"))
+    return redirect(url_for("my_view.page10"))
+
+@my_view.route("/delete/<mega_id>", methods =["POST"])
+def delete (mega_id):
+    mega = Mega.query.filter_by(id=mega_id).first() # Find the todo item by its ID
+    db.session.delete(mega) # Delete the todo item from the database
+    db.session.commit()
+    return redirect(url_for("my_view.page9"))
+
 
 @my_view.route("/page10", methods=["GET", "POST"])
 def page10():
@@ -173,24 +181,24 @@ def page10():
     name = []
     voids = []
 
-    entries = Voids.query.all()
+
+    entries = Voids.query.with_entities(Voids.name, Voids.voids).all()
     for entry in entries:
         name.append(entry.name)
         voids.append(entry.voids)
+
 
     if sort_criteria == "name_asc":
         name, voids = zip(*sorted(zip(name, voids)))
     elif sort_criteria == "name_desc":
         name, voids = zip(*sorted(zip(name, voids), reverse=True))
     elif sort_criteria == "voids_asc":
-        name, voids = zip(*sorted(zip(name, voids), key=lambda x: x[1]))
+        name, voids= zip(*sorted(zip(name, voids), key=lambda x: x[1]))
     elif sort_criteria == "voids_desc":
-        name, voids = zip(*sorted(zip(name, voids), key=lambda x: x[1], reverse=True))
+        name, voids= zip(*sorted(zip(name, voids), key=lambda x: x[1], reverse=True))
 
-    
-    
     plt.figure(figsize=(8, 6))
-    plt.bar(name, voids)
+    plt.bar(name, voids, color='skyblue')
     plt.title('Number of Voids')
     plt.xlabel('Name')
     plt.ylabel('Voids')
@@ -201,17 +209,46 @@ def page10():
     plt.close()
 
     graph_url = base64.b64encode(img.getvalue()).decode()
-    return render_template("page10.html", graph_url = graph_url, sort_criteria = sort_criteria)
+    
+    results = db.session.query(
+        Voids.name,
+        func.sum(func.cast(Voids.voids, db.Integer)).label('void_count'),
+        func.sum(func.cast(Voids.transactions, db.Integer)).label('total_count')
+    ).group_by(Voids.name).all()
 
+    # Extracting the names, void counts, and total counts from the query results
+    names = [result[0] for result in results]
+    void_counts = [result[1] for result in results]
+    total_counts = [result[2] for result in results]
 
+    # Plotting the graph
+    plt.figure(figsize=(10, 6))
 
-@my_view.route("/delete/<mega_id>", methods =["POST"])
-def delete (mega_id):
-    mega = Mega.query.filter_by(id=mega_id).first() # Find the todo item by its ID
-    db.session.delete(mega) # Delete the todo item from the database
-    db.session.commit()
-    return redirect(url_for("my_view.page9"))
+    # Create an array of indices for positioning bars
+    x = np.arange(len(names))
 
+    # Width of each bar
+    width = 0.35  
+
+    # Plotting the graph
+    plt.bar(x - width/2, total_counts, width, color='skyblue', label='Total Transactions')
+    plt.bar(x + width/2, void_counts, width, color='red', label='Voided Transactions')
+    plt.xticks(x, names)  # Set the x-axis labels to be the names
+    plt.title('Completed vs Voided Transactions by Name')
+    plt.xlabel('Name')
+    plt.ylabel('Number of Transactions')
+    plt.legend()
+    
+    # Saving the plot as a PNG image in memory
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plt.close()
+
+    # Convert the PNG image to base64 string
+    graph_transactions = base64.b64encode(img.getvalue()).decode()
+
+    return render_template('page10.html', graph_transactions=graph_transactions, graph_url=graph_url, sort_criteria=sort_criteria)
 
 # @my_view.route("/checklist")
 # def checklist():
@@ -258,27 +295,7 @@ def delete (mega_id):
 
 
 
-# @my_view.route("/graph")
-# def graph():
-    
-#     completed_count = Todo.query.filter_by(complete=True).count()   # Query the database to get counts of completed and not completed tasks
-#     not_completed_count = Todo.query.filter_by(complete=False).count()
-    
-#     plt.figure(figsize=(8, 6))  # Plotting the graph
-#     plt.bar(['Completed', 'Not Completed'], [completed_count, not_completed_count], color=['green', 'red'])
-#     plt.title('Tasks Completion Status')
-#     plt.xlabel('Status')
-#     plt.ylabel('Number of Tasks')
-#     plt.show()
-    
-#     img = BytesIO() # Save the plot as a PNG image in memory
-#     plt.savefig(img, format='png')
-#     img.seek(0)
-#     plt.close()
 
-#     graph_url = base64.b64encode(img.getvalue()).decode()       # Convert the PNG image to base64 string
-
-#     return render_template('graph.html', graph_url=graph_url)       # Render the HTML template with the graph
     
 
             # max_earnings_entry = Mega.query.order_by(Mega.daily_earnings.desc()).first()

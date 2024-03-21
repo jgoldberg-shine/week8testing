@@ -14,6 +14,8 @@
             <input type="text" id="name" name="name" placeholder="Enter a staff name" required>
             <label for="voids">Number of Voids:</label>
             <input type="number" id="voids" name="voids" placeholder="Enter number of voids" required>
+            <label for="transactions">Number of Transactions</label>
+            <input type="numer" id="transactions" name="transactions" placeholer="Enter number of transactions" required>
         </div>
         <button type="submit">Submit Data</button>
     </form>
@@ -35,5 +37,7 @@
     </form>
 
 </div>
+
+<img src="data:image/png;base64,{{ graph_transactions }}" alt="Transactions_graph">
 
 {% endblock %}
