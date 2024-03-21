@@ -210,7 +210,7 @@ def delete (mega_id):
     mega = Mega.query.filter_by(id=mega_id).first() # Find the todo item by its ID
     db.session.delete(mega) # Delete the todo item from the database
     db.session.commit()
-    return redirect(url_for("my_view.home"))
+    return redirect(url_for("my_view.page9"))
 
 
 # @my_view.route("/checklist")
