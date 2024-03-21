@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<img src="{{ url_for('static', filename='pie_charts/pigeon.png') }}" alt="Image 1">
 {% if message %}
 <p style="color: red;">{{ message }}</p>
 {% endif %}
