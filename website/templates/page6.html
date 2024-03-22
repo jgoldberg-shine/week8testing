@@ -3,24 +3,43 @@
 {% block content %}
 <section class="dashboard">
     <div class="data-segment">
-        {% for data in data %}
-            {% if data.day == 'Thursday' %}
+        {% for item in data %}
+            {% if item.day == 'Thursday' %}
             <div class="segment">
                 <h2>MVP:</h2>
-                <p>{{ data.staff_mvp }}</p>
+                <p>{{ item.staff_mvp }}</p>
                 <h2>Best Seller:</h2>
-                <p>{{ data.best_seller }}</p>
+                <p>{{ item.best_seller }}</p>
                 <h2>Worst Seller:</h2>
-                <p>{{ data.worst_seller }}</p>
+                <p>{{ item.worst_seller }}</p>
                 <h2>Daily Earnings:</h2>
-                <p>£{{ data.daily_earnings }}</p>
+                <p>£{{ item.daily_earnings }}</p>
+
+                {% set wednesday_daily_earnings = 0 %}
+                    {% for wednesday_item in data %}
+                        {% if wednesday_item.day == 'Wednesday' %}
+                            {% set wednesday_daily_earnings = wednesday_item.daily_earnings %}
+                            {% if item.daily_earnings > wednesday_daily_earnings %}
+                            <img src="{{ url_for('static', filename='pie_charts/up_arrow.jpg') }}" alt="Image 1" width="50" height="60">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='pie_charts/down_arrow.jpg') }}" alt="Image 2" width="50" height="60">
+                        {% endif %}
+
+                            {% endif %}
+                    {% endfor %}
+                    
+                    
+
+                    
+
+
             </div>
             {% endif %}
         {% endfor %}
     </div>
     <div class="images">
-        <img src="{{ url_for('static', filename='pie_charts/thursday_pie.png') }}" alt="Image 1">
-        <img src="{{ url_for('static', filename='bar_charts/thursday_bar.png') }}" alt="Image 2">
+        <img src="{{ url_for('static', filename='pie_charts/tuesday_pie.png') }}" alt="Image 1">
+        <img src="{{ url_for('static', filename='bar_charts/tuesday_bar.png') }}" alt="Image 2">
     </div>
 </section>
 {% endblock %}

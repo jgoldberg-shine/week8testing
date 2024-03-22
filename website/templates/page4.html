@@ -3,17 +3,36 @@
 {% block content %}
 <section class="dashboard">
     <div class="data-segment">
-        {% for data in data %}
-            {% if data.day == 'Tuesday' %}
+        {% for item in data %}
+            {% if item.day == 'Tuesday' %}
             <div class="segment">
                 <h2>MVP:</h2>
-                <p>{{ data.staff_mvp }}</p>
+                <p>{{ item.staff_mvp }}</p>
                 <h2>Best Seller:</h2>
-                <p>{{ data.best_seller }}</p>
+                <p>{{ item.best_seller }}</p>
                 <h2>Worst Seller:</h2>
-                <p>{{ data.worst_seller }}</p>
+                <p>{{ item.worst_seller }}</p>
                 <h2>Daily Earnings:</h2>
-                <p>£{{ data.daily_earnings }}</p>
+                <p>£{{ item.daily_earnings }}</p>
+
+                {% set monday_daily_earnings = 0 %}
+                    {% for monday_item in data %}
+                        {% if monday_item.day == 'Monday' %}
+                            {% set monday_daily_earnings = monday_item.daily_earnings %}
+                            {% if item.daily_earnings > monday_daily_earnings %}
+                            <img src="{{ url_for('static', filename='pie_charts/up_arrow.jpg') }}" alt="Image 1" width="50" height="60">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='pie_charts/down_arrow.jpg') }}" alt="Image 2" width="50" height="60">
+                        {% endif %}
+
+                            {% endif %}
+                    {% endfor %}
+                    
+                    
+
+                    
+
+
             </div>
             {% endif %}
         {% endfor %}

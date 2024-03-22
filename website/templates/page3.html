@@ -3,18 +3,32 @@
 {% block content %}
 <section class="dashboard">
     <div class="data-segment">
-        {% for data in data %}
-            {% if data.day == 'Monday' %}
-            <div class="segment">
-                <h2>MVP:</h2>
-                <p>{{ data.staff_mvp }}</p>
-                <h2>Best Seller:</h2>
-                <p>{{ data.best_seller }}</p>
-                <h2>Worst Seller:</h2>
-                <p>{{ data.worst_seller }}</p>
-                <h2>Daily Earnings:</h2>
-                <p>£{{ data.daily_earnings }}</p>
-            </div>
+        {% for item in data %}
+            {% if item.day == 'Monday' %}
+                <div class="segment">
+                    <h2>MVP:</h2>
+                    <p>{{ item.staff_mvp }}</p>
+                    <h2>Best Seller:</h2>
+                    <p>{{ item.best_seller }}</p>
+                    <h2>Worst Seller:</h2>
+                    <p>{{ item.worst_seller }}</p>
+                    <h2>Daily Earnings:</h2>
+                    <p>£{{ item.daily_earnings }}</p>
+
+                {% set sunday_daily_earnings = 0 %}
+                    {% for sunday_item in data %}
+                        {% if sunday_item.day == 'Sunday' %}
+                            {% set sunday_daily_earnings = sunday_item.daily_earnings %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if item.daily_earnings > sunday_daily_earnings %}
+                        <img src="{{ url_for('static', filename='pie_charts/up_arrow.jpg') }}" alt="Image 1" width="50" height="60">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='pie_charts/down_arrow.jpg') }}" alt="Image 2" width="50" height="60">
+                    {% endif %}
+                    
+                </div>
             {% endif %}
         {% endfor %}
     </div>
@@ -23,4 +37,5 @@
         <img src="{{ url_for('static', filename='bar_charts/monday_bar.png') }}" alt="Image 2">
     </div>
 </section>
+
 {% endblock %}
