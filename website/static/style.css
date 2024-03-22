@@ -182,3 +182,7 @@ input[type="number"] {
     border-radius: 5px;
     box-sizing: border-box;
 }
+
+.expand-text {
+    font-size: 1.5rem; /* Adjust the size as per your preference */
+}
