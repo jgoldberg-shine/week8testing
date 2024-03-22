@@ -23,9 +23,9 @@
                     {% endfor %}
                     
                     {% if item.daily_earnings > sunday_daily_earnings %}
-                        <img src="{{ url_for('static', filename='pie_charts/up_arrow.jpg') }}" alt="Image 1" width="50" height="60">
+                        <img src="{{ url_for('static', filename='pie_charts/up_arrow.png') }}" alt="Image 1" width="50" height="60">
                     {% else %}
-                        <img src="{{ url_for('static', filename='pie_charts/down_arrow.jpg') }}" alt="Image 2" width="50" height="60">
+                        <img src="{{ url_for('static', filename='pie_charts/down_arrow.png') }}" alt="Image 2" width="50" height="60">
                     {% endif %}
                     
                 </div>
