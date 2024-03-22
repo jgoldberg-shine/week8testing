@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<img src="{{ url_for('static', filename='pie_charts/pigeon.png') }}" alt="Image 1">
+
 {% if message %}
 <p style="color: red;">{{ message }}</p>
 {% endif %}
@@ -22,7 +22,7 @@
                 <input type="text" id="staff_mvp" name="staff_mvp" placeholder="Enter a staff MVP" required>
 
                 <label for="daily_earnings">Daily Earnings:</label>
-                <input type="number" step="any" id="daily_earnings" name="daily_earnings" placeholder="Enter daily earnings" required>
+                <input type="number" step=".01" id="daily_earnings" name="daily_earnings" placeholder="Enter daily earnings" required>
 
                 <label for="biggest_basket">Biggest Basket:</label>
                 <input type="number" step="any" id="biggest_basket" name="biggest_basket" placeholder="Enter biggest basket" required>
