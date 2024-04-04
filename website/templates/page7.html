@@ -13,7 +13,7 @@
                 <h2>Worst Seller:</h2>
                 <p>{{ item.worst_seller }}</p>
                 <h2>Daily Earnings:</h2>
-                <p>£{{ item.daily_earnings }}</p>
+                <p>£{{ '%.2f'|format(data.daily_earnings) }}</p>
 
                 {% set thursday_daily_earnings = 0 %}
                     {% for thursday_item in data %}

@@ -64,11 +64,11 @@
     </div>
     <div class="segment">
         <h2>Highest income </h2>
-        <p>£{{highest_day}} on {{ best_daily_earnings}}</p>
+        <p>£{{ '%.2f'|format(highest_day) }} on {{ best_daily_earnings}}</p>
     </div>
     <div class="segment">
         <h2>Biggest Basket:</h2>
-        <p>£{{ biggest_basket_earnings }}</p>
+        <p>£{{ '%.2f'|format(biggest_basket_earnings) }}</p>
     </div>
     <div class="segment">
         <h2>Best Selling Item:</h2>
