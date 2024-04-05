@@ -249,3 +249,5 @@ def page10():
     graph_transactions = base64.b64encode(img.getvalue()).decode()
 
     return render_template('page10.html', graph_transactions=graph_transactions, graph_url=graph_url, sort_criteria=sort_criteria)
+
+#
